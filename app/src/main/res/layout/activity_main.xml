@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:background="@color/colorWhite"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.guillaume_hermet.www.grooveairlineradio.activities.MainActivity">
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="3"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/logo_img">
+    <Button
+        android:id="@+id/button_events"
+        android:text="PROGRAMME / EVENEMENTS"
+        android:textColor="@color/colorWhite"
+        android:textStyle="normal"
+        android:textSize="20sp"
+        android:fontFamily="sans-serif"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@color/colorAccent"/>
+        <Button
+            android:id="@+id/button_podcast"
+            android:text="PODCAST"
+            android:textColor="@color/colorWhite"
+            android:textStyle="normal"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:background="@color/colorTeal"/>
+
+        <Button
+
+            android:id="@+id/button_skype"
+            android:text="SKYPE"
+            android:textStyle="normal"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/colorWhite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:background="@color/colorPrimary"/>
+    </LinearLayout>
+
+
+    <ImageView
+        android:background="@color/colorWhite"
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:id="@+id/logo_img"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loader_progress"
+        android:indeterminate="true"
+        android:visibility="visible"
+        android:layout_alignBottom="@+id/logo_img"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp" />
+
+    <TextView
+        android:text="Volume"
+        android:textColor="@color/colorAccent"
+        android:layout_marginStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/volume_text"
+        android:layout_above="@+id/sound_bar"
+        android:layout_alignParentStart="true" />
+
+    <ImageButton
+            android:id="@+id/button_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/colorBlack"
+            android:visibility="visible"
+            android:background="@drawable/circle"
+        android:layout_marginBottom="102dp"
+        android:layout_above="@+id/volume_text"
+        android:layout_centerHorizontal="true" />
+
+    <SeekBar
+        android:id="@+id/sound_bar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:visibility="visible"
+        android:layout_above="@+id/recycler"
+        android:layout_alignParentStart="true" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/logo_img"
+        android:fadingEdge="none"
+        android:isScrollContainer="false"
+        android:overScrollMode="never"
+        android:scrollbarSize="0dp"
+        android:scrollbars="none"
+        android:touchscreenBlocksFocus="true">
+    </android.support.v7.widget.RecyclerView>
+
+
+</RelativeLayout>
+

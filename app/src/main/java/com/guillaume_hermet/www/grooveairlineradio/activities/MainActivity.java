@@ -8,13 +8,16 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Xml;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,11 +34,24 @@ import com.guillaume_hermet.www.grooveairlineradio.models.ActionButton;
 import com.guillaume_hermet.www.grooveairlineradio.services.MusicService;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.XML;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import co.dift.ui.SwipeToAction;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 // TODO Slide Appel Skype
 // TODO Widget Play/Pause LockScreen
@@ -48,12 +64,20 @@ import co.dift.ui.SwipeToAction;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = this.getClass().getSimpleName();
+    private static final String ns = null;
     private ImageButton mPlayPause;
     private ProgressBar mLoader;
     private MediaPlayer mp;
     private SeekBar mSoundBar;
     private TextView mVolumeText;
     private MusicService mServ;
+    private String streamUrl = "http://streaming.radionomy.com/GAR?lang=fr";
+    private String logoUrl = "https://static.wixstatic.com/media/3e030d_dfcd357eb0014915b7d6b2c911b10862.png/v1/fill/w_922,h_304,al_c,usm_0.66_1.00_0.01/3e030d_dfcd357eb0014915b7d6b2c911b10862.png";
+    private String currentTrackUrl = "http://api.radionomy.com/currentsong.cfm?radiouid=7406f2d9-06a3-46bc-9290-6b60269ed7ea&apikey=ea720980-3067-4c5b-8cd8-f279fef21c48&callmeback=yes&type=xml&cover=yes&previous=yes";
+    private ImageView mLogo;
+    private ImageView mCover;
+    private TextView mTitleText;
+    private TextView mArtistText;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -67,24 +91,30 @@ public class MainActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         // finally change the color
         window.setStatusBarColor(this.getResources().getColor(R.color.colorBlack));
-        ImageView mLogo = (ImageView) findViewById(R.id.logo_img);
+        mLogo = (ImageView) findViewById(R.id.logo_img);
         Picasso.with(getApplicationContext())
-                .load("https://static.wixstatic.com/media/3e030d_dfcd357eb0014915b7d6b2c911b10862.png/v1/fill/w_922,h_304,al_c,usm_0.66_1.00_0.01/3e030d_dfcd357eb0014915b7d6b2c911b10862.png")
+                .load(logoUrl)
                 .error(R.mipmap.ic_launcher)
                 .into(mLogo);
         mPlayPause = (ImageButton) findViewById(R.id.button_play);
         mLoader = (ProgressBar) findViewById(R.id.loader_progress);
         mSoundBar = (SeekBar) findViewById(R.id.sound_bar);
         mVolumeText = (TextView) findViewById(R.id.volume_text);
-        mSoundBar.setVisibility(View.GONE);
+        mCover = (ImageView) findViewById(R.id.cover_img);
+        mTitleText = (TextView) findViewById(R.id.tv_title);
+        mArtistText = (TextView) findViewById(R.id.tv_artist);
+                mSoundBar.setVisibility(View.GONE);
         mPlayPause.setVisibility(View.GONE);
         mVolumeText.setVisibility(View.GONE);
+        mCover.setVisibility(View.GONE);
+        mTitleText.setVisibility(View.GONE);
+        mArtistText.setVisibility(View.GONE);
         mLoader.setVisibility(View.VISIBLE);
         // Media PLayer
         mp = new MediaPlayer();
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            mp.setDataSource(getBaseContext(), Uri.parse("http://streaming.radionomy.com/GAR?lang=fr"));
+            mp.setDataSource(getBaseContext(), Uri.parse(streamUrl));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(final MediaPlayer mp) {
                 Log.d(TAG, "onPrepared()");
+                getCurrentTrack();
                 mPlayPause.setVisibility(View.VISIBLE);
                 mSoundBar.setVisibility(View.VISIBLE);
                 mVolumeText.setVisibility(View.VISIBLE);
@@ -105,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
                         .load(R.mipmap.ic_play)
                         .error(R.mipmap.ic_play)
                         .into(mPlayPause);
+
+
                 // Volume Bar
                 final AudioManager audioManager =
                         (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -333,6 +366,9 @@ public class MainActivity extends AppCompatActivity {
                     .load(R.mipmap.ic_play)
                     .error(R.mipmap.ic_play)
                     .into(mPlayPause);
+            mCover.setVisibility(View.GONE);
+            mTitleText.setVisibility(View.GONE);
+            mArtistText.setVisibility(View.GONE);
         }
     }
 
@@ -343,6 +379,9 @@ public class MainActivity extends AppCompatActivity {
                     .load(R.mipmap.ic_pause)
                     .error(R.mipmap.ic_pause)
                     .into(mPlayPause);
+            mCover.setVisibility(View.VISIBLE);
+            mTitleText.setVisibility(View.VISIBLE);
+            mArtistText.setVisibility(View.VISIBLE);
         }
       /*
        MediaMetadataRetriever metaRetriver = new MediaMetadataRetriever();
@@ -355,13 +394,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-          Log.d(TAG,"OnResume");
+        Log.d(TAG, "OnResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG,"OnPause()");
+        Log.d(TAG, "OnPause()");
         //stopMusic();
         //new AsyncMusic().cancel(true);
 
@@ -375,11 +414,143 @@ public class MainActivity extends AppCompatActivity {
         mServ.stopMusic();
     }
 
+    public static class Track {
+        public final String title;
+        final String artist;
+        final String cover;
+
+        public int getCallmeback() {
+            return callmeback;
+        }
+
+        public String getCover() {
+            return cover;
+        }
+
+        public String getArtist() {
+            return artist;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        final int callmeback;
+
+        private Track(String title, String artist, String cover, int callmeback) {
+            this.title = title;
+            this.artist = artist;
+            this.cover = cover;
+            this.callmeback = callmeback;
+        }
+
+        @Override
+        public String toString() {
+            return "Entry{" +
+                    "title='" + title + '\'' +
+                    ", artist='" + artist + '\'' +
+                    ", cover='" + cover + '\'' +
+                    ", callmeback='" + callmeback + '\'' +
+                    '}';
+        }
+    }
+
+
+    private void getCurrentTrack(){
+        new currentTrackXmlTask().execute(currentTrackUrl);
+    }
+
+
+    // Implementation of AsyncTask used to download XML feed from Radionomy
+    class currentTrackXmlTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                return loadXmlFromNetwork(urls[0]);
+            } catch (IOException e) {
+                return "Connection Error";
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+                return "XML parsing Error";
+            }
+
+        }
+
+        private String loadXmlFromNetwork(String url) throws IOException, XmlPullParserException {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            XmlPullParser xpp = factory.newPullParser();
+            xpp.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(url)
+                    .build();
+            Response response = client.newCall(request).execute();
+            String xml = response.body().string();
+
+            return xml;
+
+
+        }
+
+        private JSONObject xmlToJson(String xml){
+            JSONObject jsonObj = null;
+            try {
+                jsonObj = XML.toJSONObject(xml);
+            } catch (JSONException e) {
+                Log.e("JSON exception", e.getMessage());
+                e.printStackTrace();
+            }
+            return jsonObj;
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            JSONObject json = xmlToJson(result);
+            JSONObject tracks = null;
+            String title;
+            String artist;
+            String cover;
+            int callmeback ;
+            Track currentTrack = null;
+            try {
+                tracks = json.getJSONObject("tracks");
+                title = tracks.getJSONObject("track").getString("title");
+                artist = tracks.getJSONObject("track").getString("artists");
+                cover = tracks.getJSONObject("track").getString("cover");
+                callmeback = Integer.parseInt(tracks.getJSONObject("track").getString("callmeback"));
+                currentTrack = new Track(title,artist,cover,callmeback);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG,"Response: "+tracks.toString());
+            assert currentTrack != null;
+            Picasso.with(getApplicationContext())
+                    .load(currentTrack.getCover())
+                    .fit()
+                    .error(R.mipmap.ic_launcher)
+                    .into(mCover);
+            mTitleText.setText(currentTrack.getTitle());
+            mArtistText.setText(currentTrack.getArtist());
+
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getCurrentTrack();
+                }
+            }, currentTrack.getCallmeback());
+
+
+
+
+        }
+
+
+    }
+
 
 }
-
-
-
 
 
 

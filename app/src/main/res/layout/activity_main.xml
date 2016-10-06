@@ -66,30 +66,36 @@
         android:layout_height="wrap_content"
         android:id="@+id/loader_progress"
         android:indeterminate="true"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_alignBottom="@+id/logo_img"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/recycler"
+        android:layout_alignParentStart="true">
 
     <TextView
+        android:id="@+id/volume_text"
         android:text="Volume"
         android:textColor="@color/colorAccent"
         android:layout_marginStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/volume_text"
         android:layout_above="@+id/sound_bar"
-        android:layout_alignParentStart="true" />
+       />
 
 
 
     <SeekBar
         android:id="@+id/sound_bar"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:visibility="visible"
-        android:layout_above="@+id/recycler"
-        android:layout_alignParentStart="true" />
+        android:layout_height="30dp" android:visibility="visible"
+        />
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler"
@@ -110,8 +116,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="100dp"
+        android:visibility="visible"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout2">
     <ImageView
         android:layout_margin="16dp"
         android:layout_width="60dp"
@@ -121,6 +129,7 @@
         android:layout_below="@+id/loader_progress"
         android:layout_toEndOf="@+id/linearLayout" />
         <LinearLayout
+            android:id="@+id/ll_volume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -158,10 +167,9 @@
         android:tint="@color/colorBlack"
         android:visibility="visible"
         android:background="@drawable/circle"
-        android:layout_marginBottom="102dp"
-        android:layout_above="@+id/volume_text"
-        android:layout_centerHorizontal="true" />
-
+        android:layout_below="@+id/linearLayout2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp" />
 
 </RelativeLayout>
 

@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Xml;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -57,6 +58,7 @@ import okhttp3.Response;
 // TODO Widget Play/Pause LockScreen
 // TODO Music on OffScreen
 // TODO Offline Mode (No internet)
+// TODO mode Live
 
 
 // TODO Widget (Bonus)
@@ -205,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) throws NullPointerException {
                 if (mp.isPlaying()) stopMusic();
                 Log.d(TAG, "Skype");
-                String contactUserName = "live:guillaume.hermet";
+                String contactUserName = "groove.airline";
                 initiateSkypeUri(getApplicationContext(), contactUserName, "call");
 
             }
@@ -411,7 +413,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
-        mServ.stopMusic();
+        //mServ.stopMusic();
+    }
+
+    // 2.0 and above
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
+    // Before 2.0
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     public static class Track {

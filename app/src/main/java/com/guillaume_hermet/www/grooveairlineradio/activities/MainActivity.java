@@ -90,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setUpStatusBar();
         setUpLayoutComponents();
+        if (isNetworkConnected()) {
+            setUpCoverBackground();
+            setUpMusicService();
+            getCurrentTrack();
+        }
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -105,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     if (mServ == null) {
-                        getCurrentTrack();
+
                         setUpMusicService();
                         runOnUiThread(new Runnable() {
                             @Override
@@ -115,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }
                         });
+                        getCurrentTrack();
 
                     } else {
                         runOnUiThread(new Runnable() {
@@ -129,11 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }, 500, 1000);
-        if (isNetworkConnected()) {
-            setUpCoverBackground();
-            setUpMusicService();
-            // setUpRecyclerViewButtons();
-        }
+
         setUpRecyclerViewButtons();
 
     }

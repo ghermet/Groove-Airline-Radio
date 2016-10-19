@@ -584,7 +584,7 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     if (isNetworkConnected()) getCurrentTrack();
                 }
-            }, currentTrack.getCallmeback() - 10000);
+            }, currentTrack.getCallmeback());
 
 
         }

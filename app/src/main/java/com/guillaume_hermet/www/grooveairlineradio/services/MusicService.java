@@ -4,6 +4,7 @@ package com.guillaume_hermet.www.grooveairlineradio.services;
  * Created by Guillaume on 10/3/16.
  */
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -11,28 +12,27 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
-public class MusicService extends Service implements MediaPlayer.OnErrorListener {
+public class MusicService extends Service {
 
     private final IBinder mBinder = new ServiceBinder();
-    private ImageButton mPlayPause = null;
+    private final Activity mActivity;
 
     public MediaPlayer getmPlayer() {
         return mPlayer;
     }
 
+    public void setmPlayer(MediaPlayer mPlayer) {
+        this.mPlayer = mPlayer;
+    }
+
     MediaPlayer mPlayer;
 
-    public MusicService(MediaPlayer mp, ImageButton bpp) {
-        this.mPlayer = mp;
-        this.mPlayPause = bpp;
-
+    public MusicService(Activity mActivity) {
+        this.mActivity = mActivity;
+        this.mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));
     }
-    public MusicService() {
 
-    }
 
     public class ServiceBinder extends Binder {
         public MusicService getService() {
@@ -48,20 +48,22 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     @Override
     public void onCreate() {
         super.onCreate();
-        mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse("http://listen.radionomy.com/gar"));
-        mPlayer.setOnErrorListener(this);
+
+        if (mPlayer == null)
+            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));
+        mPlayer.prepareAsync();
         if (mPlayer != null) {
             mPlayer.setVolume(100, 100);
         }
-
         mPlayer.setOnErrorListener(new OnErrorListener() {
-
             public boolean onError(MediaPlayer mp, int what, int
                     extra) {
                 onError(mPlayer, what, extra);
                 return true;
             }
         });
+
+
     }
 
     @Override
@@ -84,10 +86,11 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     }
 
     public void stopMusic() {
-        if (mPlayer.isPlaying()||mPlayer!=null) {
+        if (mPlayer.isPlaying() || mPlayer != null) {
             mPlayer.stop();
             mPlayer.release();
             mPlayer = null;
+
         }
     }
 
@@ -104,17 +107,6 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         }
     }
 
-    public boolean onError(MediaPlayer mp, int what, int extra) {
 
-        Toast.makeText(this, "music player failed", Toast.LENGTH_SHORT).show();
-        if (mPlayer != null) {
-            try {
-                mPlayer.stop();
-                mPlayer.release();
-            } finally {
-                mPlayer = null;
-            }
-        }
-        return false;
-    }
+    //
 }

@@ -1,178 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
-    android:background="@color/colorWhite"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     tools:context="com.guillaume_hermet.www.grooveairlineradio.activities.MainActivity">
 
     <LinearLayout
-        android:visibility="gone"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="3"
-        android:orientation="vertical"
-        android:id="@+id/linearLayout"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/logo_img">
-    <Button
-        android:id="@+id/button_events"
-        android:text="PROGRAMME / EVENEMENTS"
-        android:textColor="@color/colorWhite"
-        android:textStyle="normal"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:background="@color/colorAccent"/>
+        android:layout_below="@+id/logo_img"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:weightSum="3">
+
         <Button
-            android:id="@+id/button_podcast"
-            android:text="PODCAST"
-            android:textColor="@color/colorWhite"
-            android:textStyle="normal"
-            android:textSize="20sp"
-            android:fontFamily="sans-serif"
+            android:id="@+id/button_events"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:fontFamily="sans-serif"
             android:foreground="?android:attr/selectableItemBackground"
-            android:background="@color/colorTeal"/>
+            android:text="PROGRAMME / EVENEMENTS"
+            android:textColor="@color/colorWhite"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            android:filterTouchesWhenObscured="true" />
+
+        <Button
+            android:id="@+id/button_podcast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorTeal"
+            android:fontFamily="sans-serif"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:text="PODCAST"
+            android:textColor="@color/colorWhite"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            android:filterTouchesWhenObscured="true" />
 
         <Button
 
             android:id="@+id/button_skype"
-            android:text="SKYPE"
-            android:textStyle="normal"
-            android:textSize="20sp"
-            android:fontFamily="sans-serif"
-            android:textColor="@color/colorWhite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:fontFamily="sans-serif"
             android:foreground="?android:attr/selectableItemBackground"
-            android:background="@color/colorPrimary"/>
+            android:text="SKYPE"
+            android:textColor="@color/colorWhite"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            android:filterTouchesWhenObscured="true" />
     </LinearLayout>
 
 
     <ProgressBar
+        android:id="@+id/loader_progress"
         style="?android:attr/progressBarStyleLarge"
-        android:secondaryProgress="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/loader_progress"
-        android:indeterminate="true"
-        android:visibility="gone"
         android:layout_alignBottom="@+id/logo_img"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp" />
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_above="@+id/recycler"
-        android:layout_alignParentStart="true">
-
-    <TextView
-        android:id="@+id/volume_text"
-        android:text="Volume"
-        android:textColor="@color/colorAccent"
-        android:layout_marginStart="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/sound_bar"
-       />
-
-
-
-    <SeekBar
-        android:id="@+id/sound_bar"
+        android:layout_marginBottom="30dp"
+        android:indeterminate="true"
         android:secondaryProgress="@color/colorAccent"
+        android:visibility="gone" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="30dp" android:visibility="visible"
-        />
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/recycler"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/volume_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/sound_bar"
+            android:layout_marginStart="10dp"
+            android:text="Volume"
+            android:textColor="@color/colorAccent" />
+
+
+        <SeekBar
+            android:id="@+id/sound_bar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:secondaryProgress="@color/colorAccent"
+            android:visibility="visible" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusableInTouchMode="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/logo_img"
+        android:clickable="true"
         android:fadingEdge="none"
+        android:focusableInTouchMode="true"
         android:isScrollContainer="false"
         android:overScrollMode="never"
         android:scrollbarSize="0dp"
         android:scrollbars="none"
-        android:touchscreenBlocksFocus="true">
-    </android.support.v7.widget.RecyclerView>
+        android:touchscreenBlocksFocus="true" />
 
     <LinearLayout
+        android:id="@+id/ll_current_track"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:visibility="visible"
         android:orientation="horizontal"
-        android:id="@+id/linearLayout2">
-    <ImageView
-        android:layout_margin="16dp"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:srcCompat="@mipmap/ic_launcher"
-        android:id="@+id/cover_img"
-        android:layout_below="@+id/loader_progress"
-        android:layout_toEndOf="@+id/linearLayout" />
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/cover_img"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_below="@+id/loader_progress"
+            android:layout_margin="16dp"
+            android:layout_toEndOf="@+id/linearLayout"
+            app:srcCompat="@mipmap/ic_launcher" />
+
         <LinearLayout
             android:id="@+id/ll_volume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:orientation="vertical">
+
             <TextView
                 android:id="@+id/tv_title"
-                android:text="Title"
-                android:textSize="17sp"
-                android:textColor="@color/colorBlack"
-                android:textStyle="bold"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:textColor="@color/colorBlack"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/tv_artist"
-                android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:text="Artist"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Artist"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
     </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/rl_no_internet"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:visibility="gone"
+        android:background="@android:color/holo_red_light">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhite"
+            android:text="No Internet Connection"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/tv_no_internet" />
+    </RelativeLayout>
+
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_margin="12dp"
-        android:layout_height="380dp"
         android:id="@+id/logo_img"
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_margin="12dp" />
+
     <ImageButton
         android:id="@+id/button_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tint="@color/colorBlack"
-        android:visibility="visible"
-        android:background="@drawable/circle"
-        android:layout_below="@+id/linearLayout2"
+        android:layout_below="@+id/ll_current_track"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        android:background="@drawable/circle"
+        android:tint="@color/colorBlack"
+        android:visibility="visible" />
+
+
 
 </RelativeLayout>
 

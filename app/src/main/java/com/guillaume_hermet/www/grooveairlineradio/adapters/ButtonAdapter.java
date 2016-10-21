@@ -4,21 +4,22 @@ package com.guillaume_hermet.www.grooveairlineradio.adapters;
  * Created by Guillaume on 10/4/16.
  */
 
-        import android.content.Context;
-        import android.graphics.drawable.Drawable;
-        import android.support.v7.widget.RecyclerView;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.ImageView;
-        import android.widget.RelativeLayout;
-        import android.widget.TextView;
-        import com.guillaume_hermet.www.grooveairlineradio.R;
-        import com.guillaume_hermet.www.grooveairlineradio.models.ActionButton;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-        import java.util.List;
+import com.guillaume_hermet.www.grooveairlineradio.R;
+import com.guillaume_hermet.www.grooveairlineradio.models.ActionButton;
 
-        import co.dift.ui.SwipeToAction;
+import java.util.List;
+
+import co.dift.ui.SwipeToAction;
 
 
 public class ButtonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -27,7 +28,9 @@ public class ButtonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<ActionButton> items;
 
 
-    /** References to the views for each data item **/
+    /**
+     * References to the views for each data item
+     **/
     private class BookViewHolder extends SwipeToAction.ViewHolder<ActionButton> {
         private final ImageView actionLogoLeft;
         private final ImageView actionLogoRight;
@@ -46,7 +49,9 @@ public class ButtonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    /** Constructor **/
+    /**
+     * Constructor
+     **/
     public ButtonAdapter(Context mContext, List<ActionButton> items) {
         this.mContext = mContext;
         this.items = items;

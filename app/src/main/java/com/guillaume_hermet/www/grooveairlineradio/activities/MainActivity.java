@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        // RecyclerView (Listes de Buttons)
+        // RecyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case "SKYPE":
-                        if (mServ != null) stopMusic();
+                        if (mServ.getmPlayer() != null) stopMusic();
                         Log.d(TAG, "Skype");
                         String contactUserName = "groove.airline";
                         initiateSkypeUri(getApplicationContext(), contactUserName, "chat");
@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case "SKYPE":
-                        if (mServ != null) stopMusic();
+                        if (mServ.getmPlayer() != null) stopMusic();
                         Log.d(TAG, "Skype");
                         String contactUserName = "groove.airline";
                         initiateSkypeUri(getApplicationContext(), contactUserName, "call");
@@ -392,9 +392,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * @param buttons
-     */
+
     private void populate(List<ActionButton> buttons) {
         buttons.add(new ActionButton(R.color.colorTeal, R.mipmap.ic_calendar_check, R.mipmap.ic_calendar_check, "EVENTS"));
         buttons.add(new ActionButton(R.color.colorOrange, R.mipmap.ic_music, R.mipmap.ic_music, "PODCAST"));
@@ -510,12 +508,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        /**
-         * @param url -> url pour recupérer la music en direct via la REST API de Radionomy
-         * @return
-         * @throws IOException
-         * @throws XmlPullParserException
-         */
+
         private String loadXmlFromNetwork(String url) throws IOException, XmlPullParserException {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -530,10 +523,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        /**
-         * @param xml -> Réponse de la REST API au format xml
-         * @return JSONObject du xml
-         */
+
         private JSONObject xmlToJson(String xml) {
             JSONObject jsonObj = null;
             try {
@@ -641,7 +631,7 @@ public class MainActivity extends AppCompatActivity {
                                 .setOngoing(true);
 
 
-                mBuilder.setContentIntent(resultPendingIntent);
+                // mBuilder.setContentIntent(resultPendingIntent);
                 NotificationManager mNotificationManager =
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.

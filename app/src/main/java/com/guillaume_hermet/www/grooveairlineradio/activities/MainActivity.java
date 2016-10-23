@@ -612,7 +612,10 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             stackBuilder.addParentStack(MainActivity.class);
             // Creates an explicit intent for an Activity in your app
             Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            resultIntent.setAction(Intent.ACTION_MAIN);
+            resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, 0);
 // The stack builder object will contain an artificial back stack for the
 // started Activity.
 // This ensures that navigating backward from the Activity leads out of
@@ -620,12 +623,12 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
 // Adds the Intent that starts the Activity to the top of the stack
             stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent =
+           /* PendingIntent resultPendingIntent =
                     stackBuilder.getPendingIntent(
                             0,
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
-
+            */
             // Sets an ID for the notification, so it can be updated
             if (currentTrack != null) {
                 NotificationCompat.Builder mBuilder =
@@ -638,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                                 .setOngoing(true);
 
 
-                // mBuilder.setContentIntent(resultPendingIntent);
+                mBuilder.setContentIntent(resultPendingIntent);
                 NotificationManager mNotificationManager =
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.

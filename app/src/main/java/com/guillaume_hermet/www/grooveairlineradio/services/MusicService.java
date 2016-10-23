@@ -28,6 +28,7 @@ public class MusicService extends Service {
 
     MediaPlayer mPlayer;
 
+
     public MusicService(Activity mActivity) {
         this.mActivity = mActivity;
         this.mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));

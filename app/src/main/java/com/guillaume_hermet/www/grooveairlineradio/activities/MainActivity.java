@@ -1,9 +1,9 @@
 package com.guillaume_hermet.www.grooveairlineradio.activities;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +18,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
@@ -35,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
@@ -68,7 +68,7 @@ import okhttp3.Response;
 // TODO Widget (Bonus)
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ComponentCallbacks2 {
     private String TAG = this.getClass().getSimpleName();
     private ImageButton mPlayPause;
     private ProgressBar mLoader;
@@ -82,19 +82,13 @@ public class MainActivity extends AppCompatActivity {
     private Notification notification;
     private ImageView mLogo;
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpStatusBar();
+        statusBarSetup(R.color.colorBlack);
         setUpLayoutComponents();
-        if (isNetworkConnected()) {
-            setUpCoverBackground();
-            setUpMusicService();
-            getCurrentTrack();
-        }
+        findViewById(R.id.loader_progress).setVisibility(View.VISIBLE);
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -102,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (mServ.getmPlayer() != null) stopMusic();
+                            if (mServ!=null && mServ.getmPlayer()!= null) stopMusic();
                             findViewById(R.id.loader_progress).setVisibility(View.GONE);
                             findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
                         }
@@ -110,17 +104,19 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     if (mServ == null) {
-
                         setUpMusicService();
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 findViewById(R.id.rl_no_internet).setVisibility(View.GONE);
                                 setUpCoverBackground();
+                                setUpRecyclerViewButtons();
 
                             }
                         });
                         getCurrentTrack();
+
 
                     } else {
                         runOnUiThread(new Runnable() {
@@ -136,19 +132,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 500, 1000);
 
-        setUpRecyclerViewButtons();
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void setUpStatusBar() {
+
+    private void statusBarSetup(int color) {
         Window window = this.getWindow();
         // clear FLAG_TRANSLUCENT_STATUS flag:
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        }
         // finally change the color
-        window.setStatusBarColor(this.getResources().getColor(R.color.colorBlack));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(this.getResources().getColor(color));
+        }
     }
 
     private void setUpLayoutComponents() {
@@ -310,79 +311,83 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpMusicService() {
-        mServ = new MusicService(MainActivity.this);
-        mServ.getmPlayer().setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+        mServ = new MusicService(this);
+        if (mServ.getmPlayer() != null)
+            mServ.getmPlayer().setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(final MediaPlayer mp, int what, int extra) {
+                    Log.e(TAG, "onError(): " + what + " " + extra);
+                    stopMusic();
+                    return false;
+                }
+            });
+        if (mServ.getmPlayer() != null)
+            mServ.getmPlayer().setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(final MediaPlayer mp) {
+                    Log.d(TAG, "onPrepared()");
+                    mLoader.setVisibility(View.GONE);
+                    volumeBarSetup();
+                    playButtonSetup();
+
+                }
+            });
+    }
+
+    private void volumeBarSetup() {
+        // Volume Bar
+        final AudioManager audioManager =
+                (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        final SeekBar mSoundBar = (SeekBar) findViewById(R.id.sound_bar);
+        mSoundBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        mSoundBar.setProgress(audioManager
+                .getStreamVolume(AudioManager.STREAM_MUSIC));
+        mSoundBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onBufferingUpdate(MediaPlayer mp, int percent) {
-                Log.d(TAG, "onBufferingUpdate():" + percent + " %");
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             }
-        });
-        mServ.getmPlayer().setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
             @Override
-            public boolean onError(final MediaPlayer mp, int what, int extra) {
-                Log.e(TAG, "onError(): " + what + " " + extra);
-                stopMusic();
-                return false;
-            }
-        });
-        mServ.getmPlayer().setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onPrepared(final MediaPlayer mp) {
-                Log.d(TAG, "onPrepared()");
-                mPlayPause.setVisibility(View.VISIBLE);
-                mSoundBar.setVisibility(View.VISIBLE);
-                mVolumeText.setVisibility(View.VISIBLE);
-                mLoader.setVisibility(View.GONE);
-                // start music service
-                Picasso.with(getApplicationContext())
-                        .load(R.mipmap.ic_play)
-                        .error(R.mipmap.ic_play)
-                        .into(mPlayPause);
-
-
-                // Volume Bar
-                final AudioManager audioManager =
-                        (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                mSoundBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-                mSoundBar.setProgress(audioManager
-                        .getStreamVolume(AudioManager.STREAM_MUSIC));
-                mSoundBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
-                    }
-                });
-                // Play/Pause Button
-                mPlayPause.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isNetworkConnected()) {
-                            if (mServ.getmPlayer() == null)
-                                new liveStreamAsync().execute();
-                            else if (mServ.getmPlayer().isPlaying())
-                                stopMusic();
-                            else if (!mServ.getmPlayer().isPlaying()) {
-                                startMusic();
-                            }
-
-                        }
-                    }
-                });
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
 
             }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, seekBar.getProgress(), 0);
+            }
         });
+        mSoundBar.setVisibility(View.VISIBLE);
+        mVolumeText.setVisibility(View.VISIBLE);
+    }
+
+    private void playButtonSetup() {
+        // Play/Pause Button
+        Picasso.with(getApplicationContext())
+                .load(R.mipmap.ic_play)
+                .error(R.mipmap.ic_play)
+                .into(mPlayPause);
+        findViewById(R.id.button_play).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isNetworkConnected()) {
+                    if (mServ.getmPlayer() == null)
+                        new liveStreamAsync().execute();
+                    else if (mServ.getmPlayer().isPlaying())
+                        stopMusic();
+                    else if (!mServ.getmPlayer().isPlaying()) {
+                        startMusic();
+                    }
+
+                }else{
+                    if (mServ!=null&&mServ.getmPlayer()!=null) stopMusic();
+                    findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        findViewById(R.id.button_play).setVisibility(View.VISIBLE);
     }
 
     private boolean isNetworkConnected() {
@@ -390,7 +395,6 @@ public class MainActivity extends AppCompatActivity {
 
         return cm.getActiveNetworkInfo() != null;
     }
-
 
 
     private void populate(List<ActionButton> buttons) {
@@ -490,6 +494,10 @@ public class MainActivity extends AppCompatActivity {
             moveTaskToBack(true);
             return true;
         }
+        if ( keyCode == KeyEvent.KEYCODE_HOME){
+            getNotification();
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 
@@ -519,8 +527,6 @@ public class MainActivity extends AppCompatActivity {
                     .build();
             Response response = client.newCall(request).execute();
             return response.body().string();
-
-
         }
 
 
@@ -554,27 +560,28 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            assert tracks != null;
-            Log.d(TAG, "Response: " + tracks.toString());
-            assert currentTrack != null;
-            //new getBitmapFromUrlAsync().execute(currentTrack.getCover());
-            Picasso.with(getApplicationContext())
-                    .load(currentTrack.getCover())
-                    .fit()
-                    .error(R.mipmap.ic_launcher)
-                    .into(mCover);
-            mTitleText.setText(currentTrack.getTitle());
-            mArtistText.setText(currentTrack.getArtist());
-            if (notification != null) {
-                new getNotificationAsync().execute();
-            }
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isNetworkConnected()) getCurrentTrack();
+            if (tracks != null) {
+                Log.d(TAG, "Response: " + tracks.toString());
+                assert currentTrack != null;
+                //new getBitmapFromUrlAsync().execute(currentTrack.getCover());
+                Picasso.with(getApplicationContext())
+                        .load(currentTrack.getCover())
+                        .fit()
+                        .error(R.mipmap.ic_launcher)
+                        .into(mCover);
+                mTitleText.setText(currentTrack.getTitle());
+                mArtistText.setText(currentTrack.getArtist());
+                if (notification != null) {
+                    new getNotificationAsync().execute();
                 }
-            }, currentTrack.getCallmeback());
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isNetworkConnected()) getCurrentTrack();
+                    }
+                }, currentTrack.getCallmeback());
+            }
 
 
         }

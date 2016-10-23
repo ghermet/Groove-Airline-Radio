@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
@@ -64,7 +63,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-// TODO Notification statique Play/Pause
 // TODO Widget (Bonus)
 
 
@@ -96,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (mServ!=null && mServ.getmPlayer()!= null) stopMusic();
+                            if (mServ != null && mServ.getmPlayer() != null) stopMusic();
                             findViewById(R.id.loader_progress).setVisibility(View.GONE);
                             findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
                         }
@@ -381,8 +379,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         startMusic();
                     }
 
-                }else{
-                    if (mServ!=null&&mServ.getmPlayer()!=null) stopMusic();
+                } else {
+                    if (mServ != null && mServ.getmPlayer() != null) stopMusic();
                     findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
                 }
             }
@@ -486,19 +484,25 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getNotification();
+        moveTaskToBack(true);
+    }
+
     // Before 2.0
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            getNotification();
-            moveTaskToBack(true);
-            return true;
+        switch (keyCode){
+            case KeyEvent.KEYCODE_BACK:
+                getNotification();
+                moveTaskToBack(true);
+                return true;
+            default:
+                return super.onKeyDown(keyCode, event);
+
         }
-        if ( keyCode == KeyEvent.KEYCODE_HOME){
-            getNotification();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     //Implementation of AsyncTask used to download XML feed from Radionomy

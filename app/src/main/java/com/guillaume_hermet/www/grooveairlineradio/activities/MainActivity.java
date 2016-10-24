@@ -478,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     // 2.0 and above
     @Override
     public void onBackPressed() {
-        getNotification();
+        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
         moveTaskToBack(true);
 
 
@@ -487,16 +487,16 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     @Override
     protected void onStop() {
         super.onStop();
-        getNotification();
+        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
         moveTaskToBack(true);
     }
 
     // Before 2.0
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode){
+        switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                getNotification();
+                if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
                 moveTaskToBack(true);
                 return true;
             default:

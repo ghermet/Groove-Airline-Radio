@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,6 +38,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.guillaume_hermet.www.grooveairlineradio.HeadsetIntentReceiver;
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
 import com.guillaume_hermet.www.grooveairlineradio.models.ActionButton;
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         statusBarSetup(R.color.colorBlack);
+
         setUpLayoutComponents();
         findViewById(R.id.loader_progress).setVisibility(View.VISIBLE);
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -291,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 @Override
                 public void onPrepared(final MediaPlayer mp) {
                     Log.d(TAG, "onPrepared()");
+                    IntentFilter receiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+                    HeadsetIntentReceiver receiver = new HeadsetIntentReceiver(MainActivity.this,mServ);
+                    registerReceiver( receiver, receiverFilter );
                     mLoader.setVisibility(View.GONE);
                     volumeBarSetup();
                     playButtonSetup();

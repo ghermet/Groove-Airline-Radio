@@ -3,7 +3,7 @@
     package="com.guillaume_hermet.www.grooveairlineradio">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="false"
@@ -30,17 +30,25 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="market" />
             </intent-filter>
-        </activity>
 
+        </activity>
         <service
             android:name=".services.MusicService"
             android:enabled="true"
             android:isolatedProcess="true" />
 
-        <activity android:name=".activities.ProgrammeActivity"
-            android:launchMode="singleTask"/>
-        <activity android:name=".activities.PodcastActivity"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name=".activities.ProgrammeActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".activities.PodcastActivity"
+            android:launchMode="singleTask" />
+
+        <receiver android:name=".HeadsetIntentReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.HEADSET_PLUG" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

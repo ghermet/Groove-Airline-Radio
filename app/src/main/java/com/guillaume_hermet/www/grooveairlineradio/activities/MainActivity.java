@@ -193,21 +193,35 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         recyclerView.setAdapter(adapter);
 
         final SwipeToAction swipeToAction = new SwipeToAction(recyclerView, new SwipeToAction.SwipeListener<ActionButton>() {
+            Intent browserIntent;
+
             @Override
             public boolean swipeLeft(final ActionButton itemData) {
                 //moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "EVENTS":
                         Log.d(TAG, "Events/Prog");
+                        /*
                         Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
                         startActivity(progIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        */
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
+                        startActivity(browserIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        getNotification();
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
+                        /*
                         Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
                         startActivity(podcastIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        */
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
+                        startActivity(browserIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        getNotification();
                         break;
                     case "SKYPE":
                         if (mServ.getmPlayer() != null) stopMusic();
@@ -228,20 +242,32 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 switch (itemData.getTitle()) {
                     case "EVENTS":
                         Log.d(TAG, "Events/Prog");
+                        /*
                         Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
                         startActivity(progIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        */
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
+                        startActivity(browserIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        getNotification();
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
+                        /*
                         Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
                         startActivity(podcastIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        */
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
+                        startActivity(browserIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        getNotification();
                         break;
                     case "SKYPE":
                         if (mServ.getmPlayer() != null) stopMusic();
                         Log.d(TAG, "Skype");
-                        String contactUserName = "groove.airline";
+                        String contactUserName = getString(R.string.gar_username_skype);
                         initiateSkypeUri(getApplicationContext(), contactUserName, "call");
                         break;
 
@@ -257,15 +283,27 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 switch (itemData.getTitle()) {
                     case "EVENTS":
                         Log.d(TAG, "Events/Prog");
+                        /*
                         Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
                         startActivity(progIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        */
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
+                        startActivity(browserIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        getNotification();
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
+                        /*
                         Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
                         startActivity(podcastIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        */
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
+                        startActivity(browserIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        getNotification();
                         break;
                     default:
 

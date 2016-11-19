@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Groove Airline Radio</string>
     <string name="app_logo">"https://static.wixstatic.com/media/3e030d_dfcd357eb0014915b7d6b2c911b10862.png/v1/fill/w_922,h_304,al_c,usm_0.66_1.00_0.01/3e030d_dfcd357eb0014915b7d6b2c911b10862.png"</string>
+    <string name="gar_url_multimedia">http://www.grooveairline.fr/multimedia</string>
+    <string name="gar_url_podcast">http://www.grooveairline.fr/podcast</string>
+    <string name="gar_username_skype">groove.airline</string>
 </resources>

@@ -8,61 +8,22 @@
     android:background="@color/colorWhite"
     tools:context="com.guillaume_hermet.www.grooveairlineradio.activities.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <RelativeLayout
+        android:id="@+id/rl_no_internet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/logo_img"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:weightSum="3">
+        android:layout_height="30dp"
+        android:background="@android:color/holo_red_light"
+        android:visibility="gone">
 
-        <Button
-            android:id="@+id/button_events"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_no_internet"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorAccent"
-            android:fontFamily="sans-serif"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="PROGRAMME / EVENEMENTS"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp"
-            android:textStyle="normal"
-            android:filterTouchesWhenObscured="true" />
-
-        <Button
-            android:id="@+id/button_podcast"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorTeal"
-            android:fontFamily="sans-serif"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="PODCAST"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp"
-            android:textStyle="normal"
-            android:filterTouchesWhenObscured="true" />
-
-        <Button
-
-            android:id="@+id/button_skype"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            android:fontFamily="sans-serif"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="SKYPE"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp"
-            android:textStyle="normal"
-            android:filterTouchesWhenObscured="true" />
-    </LinearLayout>
-
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="No Internet Connection"
+            android:textColor="@color/colorWhite" />
+    </RelativeLayout>
 
     <ProgressBar
         android:id="@+id/loader_progress"
@@ -102,21 +63,6 @@
             android:visibility="visible" />
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/logo_img"
-        android:clickable="true"
-        android:fadingEdge="none"
-        android:focusableInTouchMode="true"
-        android:isScrollContainer="false"
-        android:overScrollMode="never"
-        android:scrollbarSize="0dp"
-        android:scrollbars="none"
-        android:touchscreenBlocksFocus="true" />
 
     <LinearLayout
         android:id="@+id/ll_current_track"
@@ -161,27 +107,12 @@
         </LinearLayout>
 
     </LinearLayout>
-    <RelativeLayout
-        android:id="@+id/rl_no_internet"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:visibility="gone"
-        android:background="@android:color/holo_red_light">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorWhite"
-            android:text="No Internet Connection"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/tv_no_internet" />
-    </RelativeLayout>
-
 
     <ImageView
+
         android:id="@+id/logo_img"
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="280dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_margin="12dp" />
@@ -192,11 +123,26 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll_current_track"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="3dp"
         android:background="@drawable/circle"
         android:tint="@color/colorBlack"
         android:visibility="visible" />
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/logo_img"
+        android:clickable="true"
+        android:fadingEdge="none"
+        android:focusableInTouchMode="true"
+        android:isScrollContainer="false"
+        android:overScrollMode="never"
+        android:scrollbarSize="0dp"
+        android:scrollbars="none"
+        android:touchscreenBlocksFocus="true" />
 
 
 </RelativeLayout>

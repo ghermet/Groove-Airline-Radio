@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:background="?android:selectableItemBackground">
+    android:layout_height="70dp">
 
     <!-- this view reveals when swipe right -->
     <RelativeLayout
-        android:tag="reveal-right"
         android:id="@+id/actionBackgoundRight"
-        android:background="@color/colorAccent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:tag="reveal-right">
 
         <ImageView
             android:id="@+id/actionLogoRight"
@@ -19,17 +18,17 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
-            android:src="@mipmap/ic_play"/>
+            android:src="@mipmap/ic_play" />
     </RelativeLayout>
 
 
     <!-- this view reveals when swipe left -->
     <RelativeLayout
-        android:tag="reveal-left"
         android:id="@+id/actionBackgoundLeft"
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:tag="reveal-left">
 
         <ImageView
             android:id="@+id/actionLogoLeft"
@@ -38,30 +37,30 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:src="@mipmap/ic_pause"/>
+            android:src="@mipmap/ic_pause" />
     </RelativeLayout>
     <!-- this is the item front view -->
     <RelativeLayout
         android:id="@+id/frontLayout"
-        android:tag="front"
-        android:background="@color/colorWhite"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp">
+        android:background="@color/colorWhite"
+        android:foreground="?android:selectableItemBackground"
+        android:padding="8dp"
+        android:tag="front">
 
         <TextView
             android:id="@+id/title"
-            android:textColor="@color/colorAccent"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:maxLines="1"
+            android:textColor="@color/colorAccent"
             android:textSize="20sp"
             android:textStyle="normal" />
 
     </RelativeLayout>
-
 
 
 </FrameLayout>

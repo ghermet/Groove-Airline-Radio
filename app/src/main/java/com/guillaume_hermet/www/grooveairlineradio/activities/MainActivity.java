@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,12 +30,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
@@ -177,44 +179,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     }
 
     private void setUpRecyclerViewButtons() {
-        // Programme / Evenements Button
-        Button mEventsButton = (Button) findViewById(R.id.button_events);
-        mEventsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Events/Prog");
-                Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
-                startActivity(progIntent);
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                //finish();
-            }
-        });
-        // Podcast Button
-        Button mPodcastButton = (Button) findViewById(R.id.button_podcast);
-        mPodcastButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Podcast");
-                Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
-                startActivity(podcastIntent);
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                // finish();
-
-
-            }
-        });
-        // Skype Button
-        Button mSkypeButton = (Button) findViewById(R.id.button_skype);
-        mSkypeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) throws NullPointerException {
-                if (mServ.getmPlayer().isPlaying()) stopMusic();
-                Log.d(TAG, "Skype");
-                String contactUserName = "groove.airline";
-                initiateSkypeUri(getApplicationContext(), contactUserName, "call");
-
-            }
-        });
         // RecyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -228,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         final SwipeToAction swipeToAction = new SwipeToAction(recyclerView, new SwipeToAction.SwipeListener<ActionButton>() {
             @Override
             public boolean swipeLeft(final ActionButton itemData) {
+                //moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "EVENTS":
                         Log.d(TAG, "Events/Prog");
@@ -256,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
             @Override
             public boolean swipeRight(ActionButton itemData) {
+                // moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "EVENTS":
                         Log.d(TAG, "Events/Prog");
@@ -284,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
             @Override
             public void onClick(ActionButton itemData) {
+                // moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "EVENTS":
                         Log.d(TAG, "Events/Prog");
@@ -474,13 +441,55 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         }
     }
 
+    private void showDialog() {
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Quit Application")
+                .setMessage("Are you sure you want to quit?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                        if (mServ.getmPlayer() != null )
+                            if (mServ.getmPlayer().isPlaying())stopMusic();
+                        NotificationManager mNotificationManager =
+                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.cancelAll();
+                        System.exit(0);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                        NotificationManager mNotificationManager =
+                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.cancelAll();
+                    }
+                })
+                .setCancelable(true)
+                .show();
+
+    }
+
 
     // 2.0 and above
     @Override
     public void onBackPressed() {
-        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
-        moveTaskToBack(true);
+        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
+            //getNotification();
+            // moveTaskToBack(true);
+            showDialog();
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.exit(0);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
@@ -488,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     protected void onStop() {
         super.onStop();
         if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
-        moveTaskToBack(true);
+        // moveTaskToBack(false);
     }
 
     // Before 2.0
@@ -497,7 +506,10 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
-                moveTaskToBack(true);
+                showDialog();
+                return true;
+            case KeyEvent.KEYCODE_HOME:
+                Toast.makeText(getApplicationContext(), "Home button", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -568,11 +580,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 Log.d(TAG, "Response: " + tracks.toString());
                 assert currentTrack != null;
                 //new getBitmapFromUrlAsync().execute(currentTrack.getCover());
-                Picasso.with(getApplicationContext())
-                        .load(currentTrack.getCover())
-                        .fit()
-                        .error(R.mipmap.ic_launcher)
-                        .into(mCover);
+                if (currentTrack != null){
+                    mCover = (ImageView) findViewById(R.id.cover_img);
+                    Picasso.with(getApplicationContext())
+                            .load(currentTrack.getCover())
+                            .fit()
+                            .error(R.mipmap.ic_launcher)
+                            .into(mCover);
+                }
                 mTitleText.setText(currentTrack.getTitle());
                 mArtistText.setText(currentTrack.getArtist());
                 if (notification != null) {

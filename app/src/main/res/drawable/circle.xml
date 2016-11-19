@@ -5,7 +5,7 @@
             <solid android:color="@color/colorWhite70" />
             <stroke android:width="1dp" android:color="@color/colorWhite" />
 
-            <size android:width="100dp" android:height="100dp" />
+            <size android:width="80dp" android:height="80dp" />
         </shape>
     </item>
     <item android:state_pressed="false">
@@ -13,7 +13,7 @@
             <solid android:color="@color/colorWhite40" />
             <stroke android:width="1dp" android:color="@color/colorWhite" />
 
-            <size android:width="100dp" android:height="100dp" />
+            <size android:width="80dp" android:height="80dp" />
         </shape>
     </item>
 </selector>

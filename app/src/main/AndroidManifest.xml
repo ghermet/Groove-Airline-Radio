@@ -37,8 +37,10 @@
             android:enabled="true"
             android:isolatedProcess="true" />
 
-        <activity android:name=".activities.ProgrammeActivity" />
-        <activity android:name=".activities.PodcastActivity" />
+        <activity android:name=".activities.ProgrammeActivity"
+            android:launchMode="singleTask"/>
+        <activity android:name=".activities.PodcastActivity"
+            android:launchMode="singleTask"/>
     </application>
 
 </manifest>

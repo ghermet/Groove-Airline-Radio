@@ -28,15 +28,16 @@
     <ProgressBar
         android:id="@+id/loader_progress"
         style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignBottom="@+id/logo_img"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="30dp"
         android:indeterminate="true"
         android:secondaryProgress="@color/colorAccent"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"

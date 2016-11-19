@@ -89,9 +89,11 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         statusBarSetup(R.color.colorBlack);
-
         setUpLayoutComponents();
         findViewById(R.id.loader_progress).setVisibility(View.VISIBLE);
+        setUpCoverIntro();
+        findViewById(R.id.logo_img).setVisibility(View.VISIBLE);
+
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -138,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
     }
 
-
     private void statusBarSetup(int color) {
         Window window = this.getWindow();
         // clear FLAG_TRANSLUCENT_STATUS flag:
@@ -174,6 +175,13 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     }
 
     private void setUpCoverBackground() {
+        String logoUrl = "http://psgpassion.free.fr/GA/gap.jpg";
+        Picasso.with(getApplicationContext())
+                .load(logoUrl)
+                .error(R.mipmap.ic_launcher)
+                .into(mLogo);
+    }
+    private void setUpCoverIntro() {
         String logoUrl = "https://static.wixstatic.com/media/3e030d_dfcd357eb0014915b7d6b2c911b10862.png/v1/fill/w_922,h_304,al_c,usm_0.66_1.00_0.01/3e030d_dfcd357eb0014915b7d6b2c911b10862.png";
         Picasso.with(getApplicationContext())
                 .load(logoUrl)
@@ -333,8 +341,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 public void onPrepared(final MediaPlayer mp) {
                     Log.d(TAG, "onPrepared()");
                     IntentFilter receiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-                    HeadsetIntentReceiver receiver = new HeadsetIntentReceiver(MainActivity.this,mServ);
-                    registerReceiver( receiver, receiverFilter );
+                    HeadsetIntentReceiver receiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
+                    registerReceiver(receiver, receiverFilter);
                     mLoader.setVisibility(View.GONE);
                     volumeBarSetup();
                     playButtonSetup();
@@ -492,8 +500,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // continue with delete
-                        if (mServ.getmPlayer() != null )
-                            if (mServ.getmPlayer().isPlaying())stopMusic();
+                        if (mServ.getmPlayer() != null)
+                            if (mServ.getmPlayer().isPlaying()) stopMusic();
                         NotificationManager mNotificationManager =
                                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotificationManager.cancelAll();
@@ -542,7 +550,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         super.onStop();
         if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
             getNotification();
-        else if(mServ.getmPlayer() != null && !mServ.getmPlayer().isPlaying()){
+        else if (mServ.getmPlayer() != null && !mServ.getmPlayer().isPlaying()) {
             NotificationManager mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancelAll();
@@ -631,7 +639,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 Log.d(TAG, "Response: " + tracks.toString());
                 assert currentTrack != null;
                 //new getBitmapFromUrlAsync().execute(currentTrack.getCover());
-                if (currentTrack != null){
+                if (currentTrack != null) {
                     mCover = (ImageView) findViewById(R.id.cover_img);
                     Picasso.with(getApplicationContext())
                             .load(currentTrack.getCover())

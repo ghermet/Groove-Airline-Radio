@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/logo_img"
         android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:layout_marginBottom="10dp"
         android:indeterminate="true"
         android:secondaryProgress="@color/colorAccent"
@@ -142,8 +143,8 @@
         android:overScrollMode="never"
         android:scrollbarSize="0dp"
         android:scrollbars="none"
+        android:orientation="vertical"
         android:touchscreenBlocksFocus="true" />
-
 
 </RelativeLayout>
 

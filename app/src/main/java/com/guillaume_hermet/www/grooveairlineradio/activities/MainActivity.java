@@ -540,7 +540,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     @Override
     protected void onStop() {
         super.onStop();
-        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
+        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
+            getNotification();
+        else if(mServ.getmPlayer() != null && !mServ.getmPlayer().isPlaying()){
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancelAll();
+        }
+
         // moveTaskToBack(false);
     }
 

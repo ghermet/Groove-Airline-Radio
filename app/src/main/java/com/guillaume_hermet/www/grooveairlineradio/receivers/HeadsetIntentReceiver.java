@@ -1,4 +1,4 @@
-package com.guillaume_hermet.www.grooveairlineradio;
+package com.guillaume_hermet.www.grooveairlineradio.receivers;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.services.MusicService;
 import com.squareup.picasso.Picasso;
 
@@ -21,16 +22,24 @@ public class HeadsetIntentReceiver extends BroadcastReceiver {
     private final Activity context;
     private final MusicService mServ;
 
+    public HeadsetIntentReceiver() {
+        context = null;
+        mServ = null;
+    }
+
     private void stopMusic() {
-        if (mServ.getmPlayer().isPlaying()) {
+        if (mServ != null && mServ.getmPlayer().isPlaying()) {
             mServ.stopMusic();
-            Picasso.with(context)
-                    .load(R.mipmap.ic_play)
-                    .error(R.mipmap.ic_play)
-                    .into((ImageView) context.findViewById(R.id.button_play));
-            context.findViewById(R.id.cover_img).setVisibility(View.GONE);
-            context.findViewById(R.id.tv_title).setVisibility(View.GONE);
-            context.findViewById(R.id.tv_artist).setVisibility(View.GONE);
+            if (context != null) {
+                Picasso.with(context)
+                        .load(R.mipmap.ic_play)
+                        .error(R.mipmap.ic_play)
+                        .into((ImageView) context.findViewById(R.id.button_play));
+                context.findViewById(R.id.cover_img).setVisibility(View.GONE);
+                context.findViewById(R.id.tv_title).setVisibility(View.GONE);
+                context.findViewById(R.id.tv_artist).setVisibility(View.GONE);
+            }
+
         }
     }
 

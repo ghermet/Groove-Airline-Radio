@@ -18,6 +18,10 @@ public class MusicService extends Service {
     private final IBinder mBinder = new ServiceBinder();
     private final Activity mActivity;
 
+    public MusicService() {
+        mActivity = null;
+    }
+
     public MediaPlayer getmPlayer() {
         return mPlayer;
     }
@@ -81,9 +85,32 @@ public class MusicService extends Service {
     }
 
     public void resumeMusic() {
-        if (!mPlayer.isPlaying()) {
-            mPlayer.start();
+        if (mPlayer==null){
+            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));
+            mPlayer.prepareAsync();
+            if (mPlayer != null) {
+                mPlayer.setVolume(100, 100);
+            }
+            mPlayer.setOnErrorListener(new OnErrorListener() {
+                public boolean onError(MediaPlayer mp, int what, int
+                        extra) {
+                    onError(mPlayer, what, extra);
+                    return true;
+                }
+            });
+            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                        mp.start();
+
+                }
+            });
+        }else{
+            if (!mPlayer.isPlaying()) {
+                mPlayer.start();
+            }
         }
+
     }
 
     public void stopMusic() {

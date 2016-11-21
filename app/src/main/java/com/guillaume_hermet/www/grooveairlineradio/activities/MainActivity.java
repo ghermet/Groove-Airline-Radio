@@ -26,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -38,11 +39,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.guillaume_hermet.www.grooveairlineradio.HeadsetIntentReceiver;
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
 import com.guillaume_hermet.www.grooveairlineradio.models.ActionButton;
 import com.guillaume_hermet.www.grooveairlineradio.models.Track;
+import com.guillaume_hermet.www.grooveairlineradio.receivers.CallIntentReceiver;
+import com.guillaume_hermet.www.grooveairlineradio.receivers.HeadsetIntentReceiver;
 import com.guillaume_hermet.www.grooveairlineradio.services.MusicService;
 import com.squareup.picasso.Picasso;
 
@@ -67,7 +69,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-// TODO Widget (Bonus)
+// TODO Broadcast Receiver Appel pour bloquer la radio
 
 
 public class MainActivity extends AppCompatActivity implements ComponentCallbacks2 {
@@ -181,8 +183,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 .error(R.mipmap.ic_launcher)
                 .into(mLogo);
     }
+
     private void setUpCoverIntro() {
-        String logoUrl = "https://static.wixstatic.com/media/3e030d_dfcd357eb0014915b7d6b2c911b10862.png/v1/fill/w_922,h_304,al_c,usm_0.66_1.00_0.01/3e030d_dfcd357eb0014915b7d6b2c911b10862.png";
+        String logoUrl = "http://psgpassion.free.fr/GA/gac.jpg";
         Picasso.with(getApplicationContext())
                 .load(logoUrl)
                 .error(R.mipmap.ic_launcher)
@@ -192,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     private void setUpRecyclerViewButtons() {
         // RecyclerView
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         List<ActionButton> buttons = new ArrayList<>();
@@ -207,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             public boolean swipeLeft(final ActionButton itemData) {
                 //moveTaskToBack(false);
                 switch (itemData.getTitle()) {
-                    case "EVENTS":
+                    case "PROGRAMME":
                         Log.d(TAG, "Events/Prog");
                         /*
                         Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
@@ -248,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             public boolean swipeRight(ActionButton itemData) {
                 // moveTaskToBack(false);
                 switch (itemData.getTitle()) {
-                    case "EVENTS":
+                    case "PROGRAMME":
                         Log.d(TAG, "Events/Prog");
                         /*
                         Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
@@ -289,14 +292,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             public void onClick(ActionButton itemData) {
                 // moveTaskToBack(false);
                 switch (itemData.getTitle()) {
-                    case "EVENTS":
+                    case "PROGRAMME":
                         Log.d(TAG, "Events/Prog");
                         /*
                         Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
                         startActivity(progIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         */
-                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
+                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.grooveairline.fr/programme"));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         getNotification();
@@ -340,10 +343,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 @Override
                 public void onPrepared(final MediaPlayer mp) {
                     Log.d(TAG, "onPrepared()");
-                    IntentFilter receiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-                    HeadsetIntentReceiver receiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
-                    registerReceiver(receiver, receiverFilter);
+                    IntentFilter noiseReceiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+                    HeadsetIntentReceiver noiseIntentreceiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
+                    registerReceiver(noiseIntentreceiver, noiseReceiverFilter);
+                    IntentFilter callReceiverFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+                    CallIntentReceiver callIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
+                    registerReceiver(callIntentReceiver, callReceiverFilter);
                     mLoader.setVisibility(View.GONE);
+                    findViewById(R.id.recycler).setVisibility(View.VISIBLE);
                     volumeBarSetup();
                     playButtonSetup();
 
@@ -415,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
 
     private void populate(List<ActionButton> buttons) {
-        buttons.add(new ActionButton(R.color.colorTeal, R.mipmap.ic_calendar_check, R.mipmap.ic_calendar_check, "EVENTS"));
+        buttons.add(new ActionButton(R.color.colorTeal, R.mipmap.ic_calendar_check, R.mipmap.ic_calendar_check, "PROGRAMME"));
         buttons.add(new ActionButton(R.color.colorOrange, R.mipmap.ic_music, R.mipmap.ic_music, "PODCAST"));
         buttons.add(new ActionButton(R.color.colorBlueSkype, R.mipmap.ic_message, R.mipmap.ic_call, "SKYPE"));
     }
@@ -548,12 +555,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     @Override
     protected void onStop() {
         super.onStop();
-        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
-            getNotification();
-        else if (mServ.getmPlayer() != null && !mServ.getmPlayer().isPlaying()) {
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.cancelAll();
+        if (mServ != null) {
+            if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
+                getNotification();
+            else if (mServ.getmPlayer() != null && !mServ.getmPlayer().isPlaying()) {
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.cancelAll();
+            }
         }
 
         // moveTaskToBack(false);

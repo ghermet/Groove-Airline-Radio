@@ -2,7 +2,6 @@ package com.guillaume_hermet.www.grooveairlineradio.activities;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,20 +9,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
@@ -37,10 +31,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
+import com.guillaume_hermet.www.grooveairlineradio.asynctasks.currentTrackNotification;
+import com.guillaume_hermet.www.grooveairlineradio.asynctasks.currentTrackXml;
+import com.guillaume_hermet.www.grooveairlineradio.asynctasks.liveStream;
 import com.guillaume_hermet.www.grooveairlineradio.models.ActionButton;
 import com.guillaume_hermet.www.grooveairlineradio.models.Track;
 import com.guillaume_hermet.www.grooveairlineradio.receivers.CallIntentReceiver;
@@ -48,26 +44,12 @@ import com.guillaume_hermet.www.grooveairlineradio.receivers.HeadsetIntentReceiv
 import com.guillaume_hermet.www.grooveairlineradio.services.MusicService;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import co.dift.ui.SwipeToAction;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 // TODO Broadcast Receiver Appel pour bloquer la radio
 
@@ -82,9 +64,15 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     private ImageView mCover;
     private TextView mTitleText;
     private TextView mArtistText;
-    private Track currentTrack;
+
+    public void setNotification(Notification notification) {
+        this.notification = notification;
+    }
+
     private Notification notification;
     private ImageView mLogo;
+    private Track currentTrack;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,9 +110,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
                             }
                         });
-                        getCurrentTrack();
-
-
+                        new currentTrackXml(MainActivity.this).loadCurrentTrack();
                     } else {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -203,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         ButtonAdapter adapter = new ButtonAdapter(getApplicationContext(), buttons);
         recyclerView.setAdapter(adapter);
 
-        final SwipeToAction swipeToAction = new SwipeToAction(recyclerView, new SwipeToAction.SwipeListener<ActionButton>() {
+        new SwipeToAction(recyclerView, new SwipeToAction.SwipeListener<ActionButton>() {
             Intent browserIntent;
 
             @Override
@@ -220,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        getNotification();
+                        new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
@@ -232,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        getNotification();
+                        new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "SKYPE":
                         if (mServ.getmPlayer() != null) stopMusic();
@@ -261,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        getNotification();
+                        new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
@@ -273,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        getNotification();
+                        new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "SKYPE":
                         if (mServ.getmPlayer() != null) stopMusic();
@@ -302,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.grooveairline.fr/programme"));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        getNotification();
+                        new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
@@ -314,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        getNotification();
+                        new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     default:
 
@@ -325,6 +311,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             public void onLongClick(ActionButton itemData) {
             }
         });
+    }
+
+    public MusicService getmServ() {
+        return mServ;
+    }
+
+    public Track getCurrentTrack() {
+        return currentTrack;
     }
 
     private void setUpMusicService() {
@@ -398,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             public void onClick(View v) {
                 if (isNetworkConnected()) {
                     if (mServ.getmPlayer() == null)
-                        new liveStreamAsync().execute();
+                        new liveStream(MainActivity.this).loadLiveStream();
                     else if (mServ.getmPlayer().isPlaying())
                         stopMusic();
                     else if (!mServ.getmPlayer().isPlaying()) {
@@ -416,9 +410,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return cm.getActiveNetworkInfo() != null;
+        return !cm.getActiveNetworkInfo().getDetailedState().equals(NetworkInfo.DetailedState.VERIFYING_POOR_LINK) && cm.getActiveNetworkInfo() != null;
     }
+
 
 
     private void populate(List<ActionButton> buttons) {
@@ -476,6 +470,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
     private void stopMusic() {
         if (mServ.getmPlayer().isPlaying()) {
+            clearNotifications();
             mServ.stopMusic();
             Picasso.with(getApplicationContext())
                     .load(R.mipmap.ic_play)
@@ -487,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         }
     }
 
-    private void startMusic() {
+    public void startMusic() {
         if (!mServ.getmPlayer().isPlaying()) {
             mServ.resumeMusic();
             Picasso.with(getApplicationContext())
@@ -509,18 +504,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         // continue with delete
                         if (mServ.getmPlayer() != null)
                             if (mServ.getmPlayer().isPlaying()) stopMusic();
-                        NotificationManager mNotificationManager =
-                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationManager.cancelAll();
+                        clearNotifications();
                         System.exit(0);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // do nothing
-                        NotificationManager mNotificationManager =
-                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotificationManager.cancelAll();
+                        clearNotifications();
                     }
                 })
                 .setCancelable(true)
@@ -528,20 +519,39 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
     }
 
+    private void clearNotifications() {
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
+    }
+
+    private void handleNotifications() {
+        if (getmServ() != null) {
+            if (getmServ().getmPlayer() != null && getmServ().getmPlayer().isPlaying())
+                new currentTrackNotification(MainActivity.this).buildNotification();
+            else if (getmServ().getmPlayer() != null && !getmServ().getmPlayer().isPlaying()) {
+                clearNotifications();
+            }
+        }
+    }
+
+    public Notification getNotification() {
+        return notification;
+    }
+
 
     // 2.0 and above
     @Override
     public void onBackPressed() {
-        if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
-            //getNotification();
-            // moveTaskToBack(true);
-            showDialog();
+        handleNotifications();
+        moveTaskToBack(true);
 
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        handleNotifications();
         System.exit(0);
     }
 
@@ -555,17 +565,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     @Override
     protected void onStop() {
         super.onStop();
-        if (mServ != null) {
-            if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying())
-                getNotification();
-            else if (mServ.getmPlayer() != null && !mServ.getmPlayer().isPlaying()) {
-                NotificationManager mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.cancelAll();
-            }
-        }
+        handleNotifications();
 
-        // moveTaskToBack(false);
     }
 
     // Before 2.0
@@ -573,11 +574,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                if (mServ.getmPlayer() != null && mServ.getmPlayer().isPlaying()) getNotification();
-                showDialog();
-                return true;
-            case KeyEvent.KEYCODE_HOME:
-                Toast.makeText(getApplicationContext(), "Home button", Toast.LENGTH_SHORT).show();
+                handleNotifications();
+                moveTaskToBack(true);
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -585,207 +583,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         }
     }
 
-    //Implementation of AsyncTask used to download XML feed from Radionomy
-    class currentTrackXmlTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            try {
-                return loadXmlFromNetwork(urls[0]);
-            } catch (IOException e) {
-                return "Connection Error";
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-                return "XML parsing Error";
-            }
 
-        }
-
-
-        private String loadXmlFromNetwork(String url) throws IOException, XmlPullParserException {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            XmlPullParser xpp = factory.newPullParser();
-            xpp.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            OkHttpClient client = new OkHttpClient();
-            Request request = new Request.Builder().url(url)
-                    .build();
-            Response response = client.newCall(request).execute();
-            return response.body().string();
-        }
-
-
-        private JSONObject xmlToJson(String xml) {
-            JSONObject jsonObj = null;
-            try {
-                jsonObj = XML.toJSONObject(xml);
-            } catch (JSONException e) {
-                /*Log.e("JSON exception", e.getMessage());*/
-                e.printStackTrace();
-            }
-            return jsonObj;
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-            JSONObject json = xmlToJson(result);
-            JSONObject tracks = null;
-            String title;
-            String artist;
-            String cover;
-            int callmeback;
-            try {
-                tracks = json.getJSONObject("tracks");
-                title = tracks.getJSONObject("track").getString("title");
-                artist = tracks.getJSONObject("track").getString("artists");
-                cover = tracks.getJSONObject("track").getString("cover");
-                callmeback = Integer.parseInt(tracks.getJSONObject("track").getString("callmeback"));
-                currentTrack = new Track(title, artist, cover, callmeback);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (tracks != null) {
-                Log.d(TAG, "Response: " + tracks.toString());
-                assert currentTrack != null;
-                //new getBitmapFromUrlAsync().execute(currentTrack.getCover());
-                if (currentTrack != null) {
-                    mCover = (ImageView) findViewById(R.id.cover_img);
-                    Picasso.with(getApplicationContext())
-                            .load(currentTrack.getCover())
-                            .fit()
-                            .error(R.mipmap.ic_launcher)
-                            .into(mCover);
-                }
-                mTitleText.setText(currentTrack.getTitle());
-                mArtistText.setText(currentTrack.getArtist());
-                if (notification != null) {
-                    new getNotificationAsync().execute();
-                }
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isNetworkConnected()) getCurrentTrack();
-                    }
-                }, currentTrack.getCallmeback());
-            }
-
-
-        }
-
-
-    }
-
-    public void getCurrentTrack() {
-        String currentTrackUrl = "http://api.radionomy.com/currentsong.cfm?radiouid=7406f2d9-06a3-46bc-9290-6b60269ed7ea&apikey=ea720980-3067-4c5b-8cd8-f279fef21c48&callmeback=yes&type=xml&cover=yes&previous=yes";
-        new currentTrackXmlTask().execute(currentTrackUrl);
-    }
-
-
-    public void getNotification() {
-        new getNotificationAsync().execute();
-    }
-
-    public class getNotificationAsync extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            buildNotification();
-            return null;
-        }
-
-        private void buildNotification() {
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
-// Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(MainActivity.class);
-            // Creates an explicit intent for an Activity in your app
-            Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-            resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            resultIntent.setAction(Intent.ACTION_MAIN);
-            resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-            PendingIntent resultPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, 0);
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
-
-// Adds the Intent that starts the Activity to the top of the stack
-            stackBuilder.addNextIntent(resultIntent);
-           /* PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-            */
-            // Sets an ID for the notification, so it can be updated
-            if (currentTrack != null) {
-                NotificationCompat.Builder mBuilder =
-                        (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.drawable.ic_music_notification)
-                                .setLargeIcon(getBitmapFromURL(currentTrack.getCover()))
-                                .setContentTitle(currentTrack.getTitle())
-                                .setContentText(currentTrack.getArtist())
-                                .setAutoCancel(true)
-                                .setOngoing(true);
-
-
-                mBuilder.setContentIntent(resultPendingIntent);
-                NotificationManager mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
-
-                notification = mBuilder.build();
-                int notifyID = 1;
-                mNotificationManager.notify(notifyID, notification);
-            }
-        }
-
-
-        private Bitmap getBitmapFromURL(String src) {
-            try {
-                URL url = new URL(src);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                return BitmapFactory.decodeStream(input);
-            } catch (IOException e) {
-                // Log exception
-                Log.e(TAG, "failed to load large Icon for notification ");
-                return BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-            }
-        }
-    }
-
-    class liveStreamAsync extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            //mServ.stopMusic();
-            mServ.setmPlayer(MediaPlayer.create(getApplicationContext(), Uri.parse("http://streaming.radionomy.com/GAR?lang=en-US")));
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPlayPause.setVisibility(View.GONE);
-            mCover.setVisibility(View.GONE);
-            mTitleText.setVisibility(View.GONE);
-            mArtistText.setVisibility(View.GONE);
-            mVolumeText.setVisibility(View.GONE);
-            mSoundBar.setVisibility(View.GONE);
-            mLoader.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mPlayPause.setVisibility(View.VISIBLE);
-            mVolumeText.setVisibility(View.VISIBLE);
-            mSoundBar.setVisibility(View.VISIBLE);
-            mLoader.setVisibility(View.GONE);
-            startMusic();
-        }
+    public void setCurrentTrack(Track currentTrack) {
+        this.currentTrack = currentTrack;
     }
 
 

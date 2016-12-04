@@ -77,9 +77,7 @@
             android:id="@+id/cover_img"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_below="@+id/loader_progress"
             android:layout_margin="16dp"
-            android:layout_toEndOf="@+id/linearLayout"
             app:srcCompat="@mipmap/ic_launcher" />
 
         <LinearLayout

@@ -60,6 +60,26 @@
             android:textSize="20sp"
             android:textStyle="normal" />
 
+        <ImageView
+            android:id="@+id/leftIndicatorIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@+id/title"
+            android:src="@drawable/ic_keyboard_arrow_left_black_24dp"
+            android:tint="@color/colorAccent"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/rightIndicatorIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/title"
+            android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+            android:tint="@color/colorAccent"
+            android:visibility="gone" />
+
     </RelativeLayout>
 
 

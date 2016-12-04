@@ -27,13 +27,14 @@ public class ButtonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private final Context mContext;
     private List<ActionButton> items;
 
-
     /**
      * References to the views for each data item
      **/
     private class BookViewHolder extends SwipeToAction.ViewHolder<ActionButton> {
         private final ImageView actionLogoLeft;
         private final ImageView actionLogoRight;
+        private final ImageView indicatorIconLeft;
+        private final ImageView indicatorIconRight;
         TextView titleView;
         RelativeLayout actionBackgroundRight;
         RelativeLayout actionBackgroundLeft;
@@ -43,8 +44,10 @@ public class ButtonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             titleView = (TextView) v.findViewById(R.id.title);
             actionBackgroundLeft = (RelativeLayout) v.findViewById(R.id.actionBackgoundLeft);
             actionLogoLeft = (ImageView) v.findViewById(R.id.actionLogoLeft);
+            indicatorIconLeft = (ImageView) v.findViewById(R.id.leftIndicatorIcon);
             actionBackgroundRight = (RelativeLayout) v.findViewById(R.id.actionBackgoundRight);
             actionLogoRight = (ImageView) v.findViewById(R.id.actionLogoRight);
+            indicatorIconRight = (ImageView) v.findViewById(R.id.rightIndicatorIcon);
 
         }
     }
@@ -81,6 +84,10 @@ public class ButtonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         ActionButton item = items.get(position);
         BookViewHolder vh = (BookViewHolder) holder;
         vh.titleView.setText(item.getTitle());
+        if (item.getTitle().equals("SKYPE")){
+            vh.indicatorIconLeft.setVisibility(View.VISIBLE);
+            vh.indicatorIconRight.setVisibility(View.VISIBLE);
+        }
         Drawable drawable = mContext.getResources().getDrawable(item.getBackground());
         vh.actionBackgroundLeft.setBackground(drawable);
         vh.actionLogoLeft.setImageDrawable(mContext.getResources().getDrawable(item.getLogoLeft()));

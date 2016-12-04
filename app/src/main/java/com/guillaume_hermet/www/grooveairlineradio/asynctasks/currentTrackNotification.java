@@ -1,5 +1,6 @@
 package com.guillaume_hermet.www.grooveairlineradio.asynctasks;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -75,6 +76,7 @@ public class currentTrackNotification {
                                 .setLargeIcon(getBitmapFromURL(context.getCurrentTrack().getCover()))
                                 .setContentTitle(context.getCurrentTrack().getTitle())
                                 .setContentText(context.getCurrentTrack().getArtist())
+                                .setPriority(Notification.PRIORITY_MAX)
                                 .setAutoCancel(true)
                                 .setOngoing(true);
 

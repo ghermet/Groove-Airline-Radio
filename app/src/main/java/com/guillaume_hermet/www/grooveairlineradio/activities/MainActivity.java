@@ -51,7 +51,6 @@ import java.util.TimerTask;
 
 import co.dift.ui.SwipeToAction;
 
-// TODO Broadcast Receiver Appel pour bloquer la radio
 
 
 public class MainActivity extends AppCompatActivity implements ComponentCallbacks2 {
@@ -338,11 +337,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 public void onPrepared(final MediaPlayer mp) {
                     Log.d(TAG, "onPrepared()");
                     IntentFilter noiseReceiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-                    HeadsetIntentReceiver noiseIntentreceiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
-                    registerReceiver(noiseIntentreceiver, noiseReceiverFilter);
-                    IntentFilter callReceiverFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+                    HeadsetIntentReceiver noiseIntentReceiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
+                    registerReceiver(noiseIntentReceiver, noiseReceiverFilter);
+                    IntentFilter callReceiverFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
                     CallIntentReceiver callIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
                     registerReceiver(callIntentReceiver, callReceiverFilter);
+                    IntentFilter incomingCallReceiverFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+                    CallIntentReceiver incomingCallIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
+                    registerReceiver(incomingCallIntentReceiver, incomingCallReceiverFilter);
                     mLoader.setVisibility(View.GONE);
                     findViewById(R.id.recycler).setVisibility(View.VISIBLE);
                     volumeBarSetup();
@@ -532,6 +534,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             else if (getmServ().getmPlayer() != null && !getmServ().getmPlayer().isPlaying()) {
                 clearNotifications();
             }
+        }else {
+            clearNotifications();
         }
     }
 
@@ -551,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     @Override
     public void onDestroy() {
         super.onDestroy();
-        handleNotifications();
+        clearNotifications();
         System.exit(0);
     }
 

@@ -32,6 +32,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.guillaume_hermet.www.grooveairlineradio.R;
 import com.guillaume_hermet.www.grooveairlineradio.adapters.ButtonAdapter;
 import com.guillaume_hermet.www.grooveairlineradio.asynctasks.currentTrackNotification;
@@ -44,6 +45,7 @@ import com.guillaume_hermet.www.grooveairlineradio.receivers.HeadsetIntentReceiv
 import com.guillaume_hermet.www.grooveairlineradio.services.MusicService;
 import com.squareup.picasso.Picasso;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         statusBarSetup(R.color.colorBlack);
         setUpLayoutComponents();

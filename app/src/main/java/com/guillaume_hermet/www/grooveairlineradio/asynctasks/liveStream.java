@@ -50,7 +50,7 @@ public class liveStream {
 
         @Override
         protected String doInBackground(String... params) {
-            context.getmServ().setmPlayer(MediaPlayer.create(context, Uri.parse("http://streaming.radionomy.com/GAR?lang=en-US")));
+            context.getmServ().setmPlayer(MediaPlayer.create(context, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE")));
             return null;
         }
 

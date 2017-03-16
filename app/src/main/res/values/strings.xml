@@ -4,5 +4,5 @@
     <string name="gar_url_multimedia">http://www.grooveairline.fr/multimedia</string>
     <string name="gar_url_podcast">http://www.grooveairline.fr/podcast</string>
     <string name="gar_username_skype">groove.airline</string>
-    <string name="gar_radionomy_current_track_api_url"><![CDATA[http://api.radionomy.com/currentsong.cfm?radiouid=7406f2d9-06a3-46bc-9290-6b60269ed7ea&apikey=ea720980-3067-4c5b-8cd8-f279fef21c48&callmeback=yes&type=xml&cover=yes&previous=yes]]></string>
+    <string name="gar_radionomy_current_track_api_url"><![CDATA[http://api.radionomy.com/currentsong.cfm?radiouid=14400804-f56e-4731-b2d4-08bbe07e6577&apikey=ea720980-3067-4c5b-8cd8-f279fef21c48&callmeback=yes&type=xml&cover=yes&previous=yes]]></string>
 </resources>

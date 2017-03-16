@@ -35,7 +35,7 @@ public class MusicService extends Service {
 
     public MusicService(Activity mActivity) {
         this.mActivity = mActivity;
-        this.mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));
+        this.mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
     }
 
 
@@ -55,7 +55,7 @@ public class MusicService extends Service {
         super.onCreate();
 
         if (mPlayer == null)
-            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));
+            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
         mPlayer.prepareAsync();
         if (mPlayer != null) {
             mPlayer.setVolume(100, 100);
@@ -86,7 +86,7 @@ public class MusicService extends Service {
 
     public void resumeMusic() {
         if (mPlayer==null){
-            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/GAR"));
+            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
             mPlayer.prepareAsync();
             if (mPlayer != null) {
                 mPlayer.setVolume(100, 100);

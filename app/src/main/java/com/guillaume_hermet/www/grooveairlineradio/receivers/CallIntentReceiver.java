@@ -19,13 +19,9 @@ import com.squareup.picasso.Picasso;
 public class CallIntentReceiver extends BroadcastReceiver {
 
     private static final String TAG = "PhoneStatReceiver";
-
     private static boolean incomingFlag = false;
-
-    private static String incoming_number = null;
     private final Activity mContext;
     private final MusicService mServ;
-    private String outgoing_number;
 
     public CallIntentReceiver(Activity activity, MusicService musicService) {
         this.mContext = activity;
@@ -74,7 +70,6 @@ public class CallIntentReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
-            outgoing_number = intent.getStringExtra("outgoing_number");
             stopMusic();
         }
         else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
@@ -86,7 +81,6 @@ public class CallIntentReceiver extends BroadcastReceiver {
 
                 case TelephonyManager.CALL_STATE_RINGING:
                     incomingFlag = true;
-                    incoming_number = intent.getStringExtra("incoming_number");
                     stopMusic();
                     break;
 

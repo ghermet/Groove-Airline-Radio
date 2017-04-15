@@ -47,28 +47,13 @@ public class currentTrackNotification {
 
         private void buildNotification() {
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-// Adds the back stack for the Intent (but not the Intent itself)
             stackBuilder.addParentStack(MainActivity.class);
-            // Creates an explicit intent for an Activity in your app
             Intent resultIntent = new Intent(context, MainActivity.class);
             resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             resultIntent.setAction(Intent.ACTION_MAIN);
             resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, 0);
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
-
-// Adds the Intent that starts the Activity to the top of the stack
             stackBuilder.addNextIntent(resultIntent);
-           /* PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-            */
-            // Sets an ID for the notification, so it can be updated
             if (context.getCurrentTrack() != null) {
                 NotificationCompat.Builder mBuilder =
                         (NotificationCompat.Builder) new NotificationCompat.Builder(context)
@@ -83,7 +68,6 @@ public class currentTrackNotification {
                 mBuilder.setContentIntent(resultPendingIntent);
                 NotificationManager mNotificationManager =
                         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
 
                 context.setNotification(mBuilder.build());
                 int notifyID = 1;
@@ -101,7 +85,6 @@ public class currentTrackNotification {
                 InputStream input = connection.getInputStream();
                 return BitmapFactory.decodeStream(input);
             } catch (IOException e) {
-                // Log exception
                 Log.e(TAG, "failed to load large Icon for notification ");
                 return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
             }

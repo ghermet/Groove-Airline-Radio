@@ -18,13 +18,17 @@ import com.squareup.picasso.Picasso;
 
 public class HeadsetIntentReceiver extends BroadcastReceiver {
 
-
     private final Activity context;
     private final MusicService mServ;
 
-    public HeadsetIntentReceiver(Activity context, MusicService mServ) {
+    public HeadsetIntentReceiver() {
+        this.context = null;
+        this.mServ = null;
+    }
+
+    public HeadsetIntentReceiver(Activity context, MusicService musicService) {
         this.context = context;
-        this.mServ = mServ;
+        this.mServ = musicService;
     }
 
     private void stopMusic() {

@@ -186,15 +186,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
             @Override
             public boolean swipeLeft(final ActionButton itemData) {
-                //moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "PROGRAMME":
                         Log.d(TAG, "Events/Prog");
-                        /*
-                        Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
-                        startActivity(progIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        */
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -202,11 +196,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
-                        /*
-                        Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
-                        startActivity(podcastIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        */
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -227,15 +216,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
             @Override
             public boolean swipeRight(ActionButton itemData) {
-                // moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "PROGRAMME":
                         Log.d(TAG, "Events/Prog");
-                        /*
-                        Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
-                        startActivity(progIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        */
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_multimedia)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -243,11 +226,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
-                        /*
-                        Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
-                        startActivity(podcastIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        */
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -268,15 +246,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
             @Override
             public void onClick(ActionButton itemData) {
-                // moveTaskToBack(false);
                 switch (itemData.getTitle()) {
                     case "PROGRAMME":
                         Log.d(TAG, "Events/Prog");
-                        /*
-                        Intent progIntent = new Intent(getApplicationContext(), ProgrammeActivity.class);
-                        startActivity(progIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        */
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.grooveairline.fr/programme"));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -284,11 +256,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         break;
                     case "PODCAST":
                         Log.d(TAG, "Podcast");
-                        /*
-                        Intent podcastIntent = new Intent(getApplicationContext(), PodcastActivity.class);
-                        startActivity(podcastIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        */
                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.gar_url_podcast)));
                         startActivity(browserIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);

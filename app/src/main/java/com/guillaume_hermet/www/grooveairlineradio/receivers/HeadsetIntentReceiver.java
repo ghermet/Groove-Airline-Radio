@@ -22,13 +22,13 @@ public class HeadsetIntentReceiver extends BroadcastReceiver {
     private final Activity context;
     private final MusicService mServ;
 
-    public HeadsetIntentReceiver() {
-        context = null;
-        mServ = null;
+    public HeadsetIntentReceiver(Activity context, MusicService mServ) {
+        this.context = context;
+        this.mServ = mServ;
     }
 
     private void stopMusic() {
-        if (mServ != null && mServ.getmPlayer().isPlaying()) {
+        if (mServ != null && mServ.getmPlayer()!=null && mServ.getmPlayer().isPlaying()) {
             mServ.stopMusic();
             if (context != null) {
                 Picasso.with(context)
@@ -41,11 +41,6 @@ public class HeadsetIntentReceiver extends BroadcastReceiver {
             }
 
         }
-    }
-
-    public HeadsetIntentReceiver(Activity context, MusicService mServ) {
-        this.context = context;
-        this.mServ = mServ;
     }
 
     @Override

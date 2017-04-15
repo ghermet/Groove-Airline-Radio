@@ -37,12 +37,17 @@ public class currentTrackXml {
 
     public currentTrackXml(MainActivity mainActivity) {
         this.context = mainActivity;
-
     }
 
     public void loadCurrentTrack() {
         String currentTrackUrl = context.getString(R.string.gar_radionomy_current_track_api_url);
         new currentTrackXmlTask().execute(currentTrackUrl);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null;
     }
 
     private class currentTrackXmlTask extends AsyncTask<String, Void, String> {
@@ -119,30 +124,26 @@ public class currentTrackXml {
                     mTitleText.setText(context.getCurrentTrack().getTitle());
                     TextView mArtistText = (TextView) context.findViewById(R.id.tv_artist);
                     mArtistText.setText(context.getCurrentTrack().getArtist());
-                }
+
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isNetworkConnected()) loadCurrentTrack();
+                        }
+                    }, context.getCurrentTrack().getCallmeback());
 
                     if (context.getNotification()!=null)
-                       new currentTrackNotification(context).buildNotification();
+                        new currentTrackNotification(context).buildNotification();
+                }
 
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isNetworkConnected()) loadCurrentTrack();
-                    }
-                }, context.getCurrentTrack().getCallmeback());
+
             }
 
 
         }
 
 
-    }
-
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return cm.getActiveNetworkInfo() != null;
     }
 
 }

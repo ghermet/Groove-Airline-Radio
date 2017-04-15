@@ -50,7 +50,14 @@ public class liveStream {
 
         @Override
         protected String doInBackground(String... params) {
-            context.getmServ().setmPlayer(MediaPlayer.create(context, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE")));
+            if(context.isNetworkConnected())context.getmServ().setmPlayer(MediaPlayer.create(context, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE")));
+            else context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (context.mServ != null) context.stopMusic();
+
+                }
+            });
             return null;
         }
 
@@ -69,11 +76,13 @@ public class liveStream {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mPlayPause.setVisibility(View.VISIBLE);
-            mVolumeText.setVisibility(View.VISIBLE);
-            mSoundBar.setVisibility(View.VISIBLE);
-            mLoader.setVisibility(View.GONE);
-            context.startMusic();
+
+                mPlayPause.setVisibility(View.VISIBLE);
+                mVolumeText.setVisibility(View.VISIBLE);
+                mSoundBar.setVisibility(View.VISIBLE);
+                mLoader.setVisibility(View.GONE);
+                context.startMusic();
+
         }
     }
 

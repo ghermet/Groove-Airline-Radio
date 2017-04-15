@@ -1,13 +1,11 @@
 package com.guillaume_hermet.www.grooveairlineradio.receivers;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -77,7 +75,6 @@ public class CallIntentReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
             outgoing_number = intent.getStringExtra("outgoing_number");
-            Log.i(TAG, "incoming call RINGING :" + outgoing_number);
             stopMusic();
         }
         else if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
@@ -90,25 +87,20 @@ public class CallIntentReceiver extends BroadcastReceiver {
                 case TelephonyManager.CALL_STATE_RINGING:
                     incomingFlag = true;
                     incoming_number = intent.getStringExtra("incoming_number");
-                    Log.i(TAG, "incoming call RINGING :" + incoming_number);
                     stopMusic();
                     break;
 
                 case TelephonyManager.CALL_STATE_OFFHOOK:
 
                     if (incomingFlag) {
-                        Log.i(TAG, "incoming call ACCEPTED :" + incoming_number);
                         stopMusic();
                     }
-
                     break;
 
                 case TelephonyManager.CALL_STATE_IDLE:
 
                     if (incomingFlag) {
-                        Log.i(TAG, "call ended");
                         startMusic();
-
                     }
 
                     break;

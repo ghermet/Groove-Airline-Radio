@@ -45,35 +45,29 @@ import com.guillaume_hermet.www.grooveairlineradio.receivers.HeadsetIntentReceiv
 import com.guillaume_hermet.www.grooveairlineradio.services.MusicService;
 import com.squareup.picasso.Picasso;
 
-import io.fabric.sdk.android.Fabric;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import co.dift.ui.SwipeToAction;
+import io.fabric.sdk.android.Fabric;
 
 
 
 public class MainActivity extends AppCompatActivity implements ComponentCallbacks2 {
+    public MusicService mServ;
     private String TAG = this.getClass().getSimpleName();
     private ImageButton mPlayPause;
     private ProgressBar mLoader;
     private SeekBar mSoundBar;
     private TextView mVolumeText;
-    private MusicService mServ;
     private ImageView mCover;
     private TextView mTitleText;
     private TextView mArtistText;
-
-    public void setNotification(Notification notification) {
-        this.notification = notification;
-    }
-
     private Notification notification;
     private ImageView mLogo;
     private Track currentTrack;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         findViewById(R.id.loader_progress).setVisibility(View.VISIBLE);
         setUpCoverIntro();
         findViewById(R.id.logo_img).setVisibility(View.VISIBLE);
-
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -93,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (mServ != null && mServ.getmPlayer() != null) stopMusic();
+                            if (mServ != null) stopMusic();
                             findViewById(R.id.loader_progress).setVisibility(View.GONE);
                             findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
                         }
@@ -102,11 +95,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 } else {
                     if (mServ == null) {
                         setUpMusicService();
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                findViewById(R.id.rl_no_internet).setVisibility(View.GONE);
                                 setUpCoverBackground();
                                 setUpRecyclerViewButtons();
 
@@ -119,13 +110,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                             public void run() {
                                 findViewById(R.id.rl_no_internet).setVisibility(View.GONE);
                             }
+
                         });
 
                     }
                 }
 
             }
-        }, 500, 1000);
+        }, 0, 200);
 
 
     }
@@ -168,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         String logoUrl = "http://psgpassion.free.fr/GA/gap.jpg";
         Picasso.with(getApplicationContext())
                 .load(logoUrl)
-                .error(R.mipmap.ic_launcher)
                 .into(mLogo);
     }
 
@@ -176,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         String logoUrl = "http://psgpassion.free.fr/GA/gac.jpg";
         Picasso.with(getApplicationContext())
                 .load(logoUrl)
-                .error(R.mipmap.ic_launcher)
                 .into(mLogo);
     }
 
@@ -223,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "SKYPE":
-                        if (mServ.getmPlayer() != null) stopMusic();
+                        stopMusic();
                         Log.d(TAG, "Skype");
                         String contactUserName = "groove.airline";
                         initiateSkypeUri(getApplicationContext(), contactUserName, "chat");
@@ -264,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                         new currentTrackNotification(MainActivity.this).buildNotification();
                         break;
                     case "SKYPE":
-                        if (mServ.getmPlayer() != null) stopMusic();
+                        stopMusic();
                         Log.d(TAG, "Skype");
                         String contactUserName = getString(R.string.gar_username_skype);
                         initiateSkypeUri(getApplicationContext(), contactUserName, "call");
@@ -323,38 +313,49 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         return currentTrack;
     }
 
-    private void setUpMusicService() {
-        mServ = new MusicService(this);
-        if (mServ.getmPlayer() != null)
-            mServ.getmPlayer().setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(final MediaPlayer mp, int what, int extra) {
-                    Log.e(TAG, "onError(): " + what + " " + extra);
-                    stopMusic();
-                    return false;
-                }
-            });
-        if (mServ.getmPlayer() != null)
-            mServ.getmPlayer().setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(final MediaPlayer mp) {
-                    Log.d(TAG, "onPrepared()");
-                    IntentFilter noiseReceiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-                    HeadsetIntentReceiver noiseIntentReceiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
-                    registerReceiver(noiseIntentReceiver, noiseReceiverFilter);
-                    IntentFilter callReceiverFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
-                    CallIntentReceiver callIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
-                    registerReceiver(callIntentReceiver, callReceiverFilter);
-                    IntentFilter incomingCallReceiverFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-                    CallIntentReceiver incomingCallIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
-                    registerReceiver(incomingCallIntentReceiver, incomingCallReceiverFilter);
-                    mLoader.setVisibility(View.GONE);
-                    findViewById(R.id.recycler).setVisibility(View.VISIBLE);
-                    volumeBarSetup();
-                    playButtonSetup();
+    public void setCurrentTrack(Track currentTrack) {
+        this.currentTrack = currentTrack;
+    }
 
-                }
-            });
+    private void setUpMusicService() {
+        if (isNetworkConnected()) {
+            findViewById(R.id.rl_connected).setVisibility(View.VISIBLE);
+            mServ = new MusicService(this);
+            if (mServ.getmPlayer() != null)
+                mServ.getmPlayer().setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                    @Override
+                    public boolean onError(final MediaPlayer mp, int what, int extra) {
+                        Log.e(TAG, "onError(): " + what + " " + extra);
+                        mServ.getmPlayer().stop();
+                        return false;
+                    }
+                });
+            if (mServ.getmPlayer() != null)
+                mServ.getmPlayer().setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(final MediaPlayer mp) {
+                        findViewById(R.id.rl_no_internet).setVisibility(View.GONE);
+                        findViewById(R.id.rl_connected).setVisibility(View.GONE);
+                        Log.d(TAG, "onPrepared()");
+                        IntentFilter noiseReceiverFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+                        HeadsetIntentReceiver noiseIntentReceiver = new HeadsetIntentReceiver(MainActivity.this, mServ);
+                        registerReceiver(noiseIntentReceiver, noiseReceiverFilter);
+                        IntentFilter callReceiverFilter = new IntentFilter(Intent.ACTION_NEW_OUTGOING_CALL);
+                        CallIntentReceiver callIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
+                        registerReceiver(callIntentReceiver, callReceiverFilter);
+                        IntentFilter incomingCallReceiverFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+                        CallIntentReceiver incomingCallIntentReceiver = new CallIntentReceiver(MainActivity.this, mServ);
+                        registerReceiver(incomingCallIntentReceiver, incomingCallReceiverFilter);
+                        mLoader.setVisibility(View.GONE);
+                        findViewById(R.id.recycler).setVisibility(View.VISIBLE);
+                        volumeBarSetup();
+                        playButtonSetup();
+
+                    }
+                });
+        }else{
+            findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
+        }
     }
 
     private void volumeBarSetup() {
@@ -405,7 +406,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                     }
 
                 } else {
-                    if (mServ != null && mServ.getmPlayer() != null) stopMusic();
+                    if (mServ != null) stopMusic();
+                    Picasso.with(getApplicationContext())
+                            .load(R.mipmap.ic_play)
+                            .error(R.mipmap.ic_play)
+                            .into(mPlayPause);
+                    mCover.setVisibility(View.GONE);
+                    mTitleText.setVisibility(View.GONE);
+                    mArtistText.setVisibility(View.GONE);
                     findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
                 }
             }
@@ -413,10 +421,12 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         findViewById(R.id.button_play).setVisibility(View.VISIBLE);
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return !cm.getActiveNetworkInfo().getDetailedState().equals(NetworkInfo.DetailedState.VERIFYING_POOR_LINK) && cm.getActiveNetworkInfo() != null;
-    }
+    public boolean isNetworkConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnected();
+            }
 
 
 
@@ -473,8 +483,8 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
 
     }
 
-    private void stopMusic() {
-        if (mServ.getmPlayer().isPlaying()) {
+    public void stopMusic() {
+        if (mServ.getmPlayer()!=null && mServ.getmPlayer().isPlaying()) {
             clearNotifications();
             mServ.stopMusic();
             Picasso.with(getApplicationContext())
@@ -485,10 +495,14 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             mTitleText.setVisibility(View.GONE);
             mArtistText.setVisibility(View.GONE);
         }
+        if(!isNetworkConnected()){
+           findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
+        }
     }
 
     public void startMusic() {
-        if (!mServ.getmPlayer().isPlaying()) {
+        if(isNetworkConnected()){
+        if (mServ.getmPlayer()!=null&&!mServ.getmPlayer().isPlaying()) {
             mServ.resumeMusic();
             Picasso.with(getApplicationContext())
                     .load(R.mipmap.ic_stop)
@@ -497,6 +511,10 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
             mCover.setVisibility(View.VISIBLE);
             mTitleText.setVisibility(View.VISIBLE);
             mArtistText.setVisibility(View.VISIBLE);
+        }
+        }else{
+            findViewById(R.id.loader_progress).setVisibility(View.GONE);
+            findViewById(R.id.rl_no_internet).setVisibility(View.VISIBLE);
         }
     }
 
@@ -508,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                     public void onClick(DialogInterface dialog, int which) {
                         // continue with delete
                         if (mServ.getmPlayer() != null)
-                            if (mServ.getmPlayer().isPlaying()) stopMusic();
+                            stopMusic();
                         clearNotifications();
                         System.exit(0);
                     }
@@ -546,6 +564,9 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         return notification;
     }
 
+    public void setNotification(Notification notification) {
+        this.notification = notification;
+    }
 
     // 2.0 and above
     @Override
@@ -561,7 +582,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
         clearNotifications();
         System.exit(0);
     }
-
 
     @Override
     protected void onResume() {
@@ -588,11 +608,6 @@ public class MainActivity extends AppCompatActivity implements ComponentCallback
                 return super.onKeyDown(keyCode, event);
 
         }
-    }
-
-
-    public void setCurrentTrack(Track currentTrack) {
-        this.currentTrack = currentTrack;
     }
 
 

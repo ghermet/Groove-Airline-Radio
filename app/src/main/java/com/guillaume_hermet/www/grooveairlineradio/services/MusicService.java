@@ -6,20 +6,34 @@ package com.guillaume_hermet.www.grooveairlineradio.services;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.view.View;
+
+import com.guillaume_hermet.www.grooveairlineradio.R;
 
 public class MusicService extends Service {
 
     private final IBinder mBinder = new ServiceBinder();
     private final Activity mActivity;
+    MediaPlayer mPlayer;
 
     public MusicService() {
         mActivity = null;
+    }
+
+    public MusicService(Activity mActivity) {
+        this.mActivity = mActivity;
+        if (isNetworkConnected()) {
+            this.mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
+        }
     }
 
     public MediaPlayer getmPlayer() {
@@ -30,19 +44,11 @@ public class MusicService extends Service {
         this.mPlayer = mPlayer;
     }
 
-    MediaPlayer mPlayer;
-
-
-    public MusicService(Activity mActivity) {
-        this.mActivity = mActivity;
-        this.mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
-    }
-
-
-    public class ServiceBinder extends Binder {
-        public MusicService getService() {
-            return MusicService.this;
-        }
+    public boolean isNetworkConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnected();
     }
 
     @Override
@@ -53,21 +59,27 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        if (mPlayer == null)
-            mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
-        mPlayer.prepareAsync();
-        if (mPlayer != null) {
-            mPlayer.setVolume(100, 100);
-        }
-        mPlayer.setOnErrorListener(new OnErrorListener() {
-            public boolean onError(MediaPlayer mp, int what, int
-                    extra) {
-                onError(mPlayer, what, extra);
-                return true;
+        if (isNetworkConnected()) {
+            if (mPlayer == null)
+                mPlayer = MediaPlayer.create(mActivity, Uri.parse("http://listen.radionomy.com/RADIOGROOVEAIRLINE"));
+            mPlayer.prepareAsync();
+            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mActivity.findViewById(R.id.rl_connected).setVisibility(View.GONE);
+                }
+            });
+            if (mPlayer != null) {
+                mPlayer.setVolume(100, 100);
             }
-        });
-
+            mPlayer.setOnErrorListener(new OnErrorListener() {
+                public boolean onError(MediaPlayer mp, int what, int
+                        extra) {
+                    onError(mPlayer, what, extra);
+                    return true;
+                }
+            });
+        }
 
     }
 
@@ -132,6 +144,12 @@ public class MusicService extends Service {
             } finally {
                 mPlayer = null;
             }
+        }
+    }
+
+    public class ServiceBinder extends Binder {
+        public MusicService getService() {
+            return MusicService.this;
         }
     }
 
